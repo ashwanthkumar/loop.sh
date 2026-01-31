@@ -51,7 +51,12 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 | `--max-runs N` | Maximum loop iterations | `20` |
 | `--check` | Audit `.claude/settings.local.json` for missing permissions needed by the prompt | |
 | `--yes` | With `--check`, actually apply the missing permissions to the settings file | `no` |
+| `--no-update` | Skip the auto-update check on startup | |
 | `--help` | Show help | |
+
+## Auto-update
+
+On startup, `loop.sh` checks for a newer version from the main branch on GitHub. If an update is available, it prompts you to apply it. The check is skipped silently if the script has local modifications in a git repo or if the download fails. Pass `--no-update` to skip this check entirely.
 
 ## Logs
 
