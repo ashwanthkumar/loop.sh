@@ -37,6 +37,9 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 
 # Check if .claude/settings.local.json has the permissions needed for autonomous execution
 ./loop.sh --check --prompt "run tests and fix bugs"
+
+# Check and automatically apply missing permissions to settings file
+./loop.sh --check --yes --prompt "run tests and fix bugs"
 ```
 
 ### Options
@@ -47,6 +50,7 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 | `--prompt-file FILE` | Read the prompt from a file | |
 | `--max-runs N` | Maximum loop iterations | `20` |
 | `--check` | Audit `.claude/settings.local.json` for missing permissions needed by the prompt | |
+| `--yes` | With `--check`, actually apply the missing permissions to the settings file | `no` |
 | `--help` | Show help | |
 
 ## Logs
