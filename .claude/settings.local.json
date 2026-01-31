@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "WebSearch",
+
+      "Bash(uv init*)",
+      "Bash(uv sync*)",
+      "Bash(uv add*)",
+      "Bash(uv run pytest*)",
+      "Bash(uv run ruff*)",
+
+      "Bash(ls:*)",
+
+      "Bash(gh issue view:*)",
+      "Bash(gh api:*)"
+    ]
+  }
+}
