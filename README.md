@@ -34,6 +34,9 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 
 # Limit the number of iterations (default: 20)
 ./loop.sh --max-runs 5 --prompt "add logging to all API handlers"
+
+# Check if .claude/settings.local.json has the permissions needed for autonomous execution
+./loop.sh --check --prompt "run tests and fix bugs"
 ```
 
 ### Options
@@ -43,6 +46,7 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 | `--prompt "..."` | Inline prompt to send to Claude | *(required unless `--prompt-file`)* |
 | `--prompt-file FILE` | Read the prompt from a file | |
 | `--max-runs N` | Maximum loop iterations | `20` |
+| `--check` | Audit `.claude/settings.local.json` for missing permissions needed by the prompt | |
 | `--help` | Show help | |
 
 ## Logs
