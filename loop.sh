@@ -10,19 +10,34 @@ UPDATE_URL="https://raw.githubusercontent.com/ashwanthkumar/loop.sh/refs/heads/m
 
 # Auto-update check (silently ignored on failure)
 check_for_updates() {
-  local self="$0"
+  # Resolve the actual path of this script (handles symlinks and relative paths)
+  local self
+  self="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+  [[ -f "$self" ]] || return 0
+
   local tmp
   tmp=$(mktemp) || return 0
+  trap 'rm -f "$tmp"' RETURN
 
   # Download latest version; silently bail on any failure
   if ! curl -fsSL --connect-timeout 5 --max-time 10 "$UPDATE_URL" -o "$tmp" 2>/dev/null; then
-    rm -f "$tmp"
     return 0
+  fi
+
+  # Verify the download looks like a valid shell script
+  if ! head -1 "$tmp" 2>/dev/null | grep -q '^#!/'; then
+    return 0
+  fi
+
+  # Skip update if the script is in a git repo with local modifications
+  if command -v git &>/dev/null && git -C "$(dirname "$self")" rev-parse --is-inside-work-tree &>/dev/null; then
+    if ! git -C "$(dirname "$self")" diff --quiet -- "$self" 2>/dev/null; then
+      return 0
+    fi
   fi
 
   # Compare with current script
   if cmp -s "$self" "$tmp"; then
-    rm -f "$tmp"
     return 0
   fi
 
@@ -31,16 +46,21 @@ check_for_updates() {
   if [[ "$answer" =~ ^[Yy]$ ]]; then
     cp "$tmp" "$self"
     chmod +x "$self"
-    rm -f "$tmp"
     echo "Updated. Please re-run the script."
     exit 0
   else
     echo "Skipping update."
-    rm -f "$tmp"
   fi
 }
 
-check_for_updates
+NO_UPDATE=false
+
+# Parse --no-update early (before main arg parsing) so it's handled before the update check
+for arg in "$@"; do
+  [[ "$arg" == "--no-update" ]] && NO_UPDATE=true && break
+done
+
+[[ "$NO_UPDATE" == false ]] && check_for_updates
 
 MAX_RUNS=20
 LOG_DIR="./build-logs"
@@ -61,6 +81,7 @@ Options:
   --max-runs N         Maximum number of runs (default: 20)
   --check              Check if .claude/settings.local.json has all permissions needed for the prompt
   --yes                With --check, actually apply the missing permissions to settings file (default: no)
+  --no-update          Skip the auto-update check
   --help               Show this help message
 
 Examples:
@@ -84,6 +105,7 @@ while [[ $# -gt 0 ]]; do
     --prompt-file) PROMPT_FILE="$2"; shift 2 ;;
     --check) CHECK_MODE=true; shift ;;
     --yes) YES_MODE=true; shift ;;
+    --no-update) shift ;;  # already handled above
     --help|-h) usage ;;
     *) echo "Unknown option: $1"; echo "Run ./loop.sh --help for usage."; exit 1 ;;
   esac
