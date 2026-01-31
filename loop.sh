@@ -227,7 +227,9 @@ for ((run=1; run<=MAX_RUNS; run++)); do
   wait "$claude_pid"
   exit_code=$?
   sleep 1
+  disown "$tail_pid" 2>/dev/null || true
   kill "$tail_pid" 2>/dev/null || true
+  wait "$tail_pid" 2>/dev/null || true
 
   if [[ "$exit_code" -ne 0 ]]; then
     echo ""
