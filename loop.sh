@@ -6,6 +6,42 @@ set -euo pipefail
 # Usage: ./loop.sh [--max-runs N] [--prompt "custom prompt"]
 #        ./loop.sh --prompt-file prompt.txt
 
+UPDATE_URL="https://raw.githubusercontent.com/ashwanthkumar/loop.sh/refs/heads/main/loop.sh"
+
+# Auto-update check (silently ignored on failure)
+check_for_updates() {
+  local self="$0"
+  local tmp
+  tmp=$(mktemp) || return 0
+
+  # Download latest version; silently bail on any failure
+  if ! curl -fsSL --connect-timeout 5 --max-time 10 "$UPDATE_URL" -o "$tmp" 2>/dev/null; then
+    rm -f "$tmp"
+    return 0
+  fi
+
+  # Compare with current script
+  if cmp -s "$self" "$tmp"; then
+    rm -f "$tmp"
+    return 0
+  fi
+
+  echo "A new version of loop.sh is available."
+  read -rp "Do you want to update? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    cp "$tmp" "$self"
+    chmod +x "$self"
+    rm -f "$tmp"
+    echo "Updated. Please re-run the script."
+    exit 0
+  else
+    echo "Skipping update."
+    rm -f "$tmp"
+  fi
+}
+
+check_for_updates
+
 MAX_RUNS=20
 LOG_DIR="./build-logs"
 CUSTOM_PROMPT=""
