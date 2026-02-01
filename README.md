@@ -51,8 +51,6 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 
 Instead of pre-configuring allowed tools in `settings.local.json`, this project uses a `PermissionRequest` prompt hook (defined in `.claude/settings.json`). When Claude Code requests permission for a tool action, the hook routes the request to Claude Opus 4.5 for evaluation. Safe dev commands are approved automatically; dangerous operations (deleting files outside the project, modifying system files, exfiltrating data) are denied.
 
-This replaces the previous `--check` / `--yes` flags — permissions are now handled dynamically at runtime.
-
 To see hook execution in action, run `claude --debug`.
 
 ## Auto-update
