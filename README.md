@@ -35,11 +35,6 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 # Limit the number of iterations (default: 20)
 ./loop.sh --max-runs 5 --prompt "add logging to all API handlers"
 
-# Check if .claude/settings.local.json has the permissions needed for autonomous execution
-./loop.sh --check --prompt "run tests and fix bugs"
-
-# Check and automatically apply missing permissions to settings file
-./loop.sh --check --yes --prompt "run tests and fix bugs"
 ```
 
 ### Options
@@ -49,10 +44,16 @@ Claude Code's CLI (`claude -p`) runs a single prompt-to-completion turn. For lar
 | `--prompt "..."` | Inline prompt to send to Claude | *(required unless `--prompt-file`)* |
 | `--prompt-file FILE` | Read the prompt from a file | |
 | `--max-runs N` | Maximum loop iterations | `20` |
-| `--check` | Audit `.claude/settings.local.json` for missing permissions needed by the prompt | |
-| `--yes` | With `--check`, actually apply the missing permissions to the settings file | `no` |
 | `--no-update` | Skip the auto-update check on startup | |
 | `--help` | Show help | |
+
+## Automated Permissions via PermissionRequest Hook
+
+Instead of pre-configuring allowed tools in `settings.local.json`, this project uses a `PermissionRequest` prompt hook (defined in `.claude/settings.json`). When Claude Code requests permission for a tool action, the hook routes the request to Claude Opus 4.5 for evaluation. Safe dev commands are approved automatically; dangerous operations (deleting files outside the project, modifying system files, exfiltrating data) are denied.
+
+This replaces the previous `--check` / `--yes` flags — permissions are now handled dynamically at runtime.
+
+To see hook execution in action, run `claude --debug`.
 
 ## Auto-update
 

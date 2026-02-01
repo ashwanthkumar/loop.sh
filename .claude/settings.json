@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/permission-review.sh",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
